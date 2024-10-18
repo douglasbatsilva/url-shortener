@@ -15,7 +15,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: false,
+        // Vou deixar estes 2 parâmetros abaixo deste modo.
+        // Não é indicado deixar para produção, mas para rodar os testes
+        // é interessante deixar assim para não serem necessárias alterações
+        schema: 'public',
+        synchronize: true,
       }),
     }),
   ],
