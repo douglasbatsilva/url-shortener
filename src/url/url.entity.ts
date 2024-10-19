@@ -6,12 +6,12 @@ export class Url {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'authorId' })
-  author: User;
+  author: User | null;
 
-  @Column({ nullable: true }) 
-  authorId: string;
+  @Column({ nullable: true })
+  authorId: number | null;
 
   @Column()
   originalUrl: string;
@@ -19,8 +19,8 @@ export class Url {
   @Column({ length: 6 })
   shortUrl: string;
 
-  @Column({ default: false })
-  isDeleted: boolean;
+  @Column({ default: 0 })
+  clicks: number;
 
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date | null;
