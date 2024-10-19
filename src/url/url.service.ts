@@ -4,7 +4,7 @@ import { UrlRepository } from './url.repository';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Url } from './url.entity';
-import { UpdateResult } from 'typeorm';
+import { IsNull, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class UrlService {
@@ -42,7 +42,7 @@ export class UrlService {
   }
 
   async find(where: Partial<Url>): Promise<any> {
-    const foundUrl = await this.repository.findOne({ ...where, deletedAt: null });
+    const foundUrl = await this.repository.findOne({ ...where, deletedAt: IsNull() as any }) as Url;
 
     if (foundUrl == null) {
       throw new HttpException('URL not found', HttpStatus.NOT_FOUND);
@@ -66,7 +66,7 @@ export class UrlService {
 
 
   async list(userId: number | null): Promise<Partial<Url>[]> {
-    const urls = await this.repository.find({ authorId: userId, deletedAt: null });
+    const urls = await this.repository.find({ authorId: userId, deletedAt: IsNull() as any }) as Url[];
 
     return urls.map((url) => {
       return {
