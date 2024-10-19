@@ -26,10 +26,10 @@ export class JwtAuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-  
+
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
-  
+
     if (isPublic) {
       if (authHeader) return this.decodeAuthToken(request);
       return true;

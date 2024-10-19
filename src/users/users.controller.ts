@@ -15,7 +15,10 @@ export class UsersController {
   }
 
   @Post('login')
-  async login(@Body() body: Partial<UserRegisterDTO>, @Res() reply: FastifyReply) {
+  async login(
+    @Body() body: Partial<UserRegisterDTO>,
+    @Res() reply: FastifyReply,
+  ) {
     const resp = await this.service.login(body);
     reply.status(200).send(resp);
   }

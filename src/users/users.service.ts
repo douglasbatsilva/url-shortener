@@ -30,7 +30,7 @@ export class UsersService {
     return { ...body, password: hash };
   }
 
-  async login(body: Partial<UserRegisterDTO>): Promise<{ token: string }>{
+  async login(body: Partial<UserRegisterDTO>): Promise<{ token: string }> {
     const user = await this.repository.findByEmail(body.email);
 
     if (!user?.length) {

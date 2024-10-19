@@ -8,19 +8,25 @@ import { IsNull, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class UrlService {
-  private nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
+  private nanoid = customAlphabet(
+    '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    6,
+  );
 
   constructor(
     private readonly configService: ConfigService,
     private readonly repository: UrlRepository,
   ) {}
 
-  async createShortUrl(originalUrl: string, userId: number | null): Promise<string> {
+  async createShortUrl(
+    originalUrl: string,
+    userId: number | null,
+  ): Promise<string> {
     const treatedUrl = this.treatUrl(originalUrl);
 
     const shortUrl = this.nanoid();
 
-    const urlBody: Partial<Url> = { originalUrl: treatedUrl, shortUrl }
+    const urlBody: Partial<Url> = { originalUrl: treatedUrl, shortUrl };
 
     if (userId != null) urlBody.author = { id: userId } as User;
 
@@ -32,9 +38,10 @@ export class UrlService {
   }
 
   treatUrl(url: string): string | null {
-    const regex = /^(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/g;
+    const regex =
+      /^(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/g;
 
-    if (regex.test(url) === false ) return null
+    if (regex.test(url) === false) return null;
 
     if (!/^https?:\/\//.test(url)) return `https://${url}`;
 
@@ -42,7 +49,10 @@ export class UrlService {
   }
 
   async find(where: Partial<Url>): Promise<any> {
-    const foundUrl = await this.repository.findOne({ ...where, deletedAt: IsNull() as any }) as Url;
+    const foundUrl = (await this.repository.findOne({
+      ...where,
+      deletedAt: IsNull() as any,
+    })) as Url;
 
     if (foundUrl == null) {
       throw new HttpException('URL not found', HttpStatus.NOT_FOUND);
@@ -64,20 +74,26 @@ export class UrlService {
     return foundUrl.originalUrl;
   }
 
-
   async list(userId: number | null): Promise<Partial<Url>[]> {
-    const urls = await this.repository.find({ authorId: userId, deletedAt: IsNull() as any }) as Url[];
+    const urls = (await this.repository.find({
+      authorId: userId,
+      deletedAt: IsNull() as any,
+    })) as Url[];
 
     return urls.map((url) => {
       return {
         originalUrl: url.originalUrl,
         shortUrl: url.shortUrl,
-        clicks: url.clicks
-      }
-    })
+        clicks: url.clicks,
+      };
+    });
   }
 
-  async update(shortUrl: string, userId: number | null, url: string): Promise<UpdateResult> {
+  async update(
+    shortUrl: string,
+    userId: number | null,
+    url: string,
+  ): Promise<UpdateResult> {
     const foundUrl = await this.find({ shortUrl, authorId: userId });
 
     foundUrl.originalUrl = this.treatUrl(url);
