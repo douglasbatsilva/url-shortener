@@ -15,9 +15,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: false })
-  deleted: boolean;
-
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
