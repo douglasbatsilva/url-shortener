@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserRegisterDTO } from './dto/user.dto';
-import { createHash, randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 import { UsersRepository } from './users.repository';
 import { JwtService } from '@nestjs/jwt';
 
@@ -30,7 +30,7 @@ export class UsersService {
     return { ...body, password: hash };
   }
 
-  async login(body: Partial<UserRegisterDTO>): Promise<string> {
+  async login(body: Partial<UserRegisterDTO>): Promise<{ token: string }>{
     const user = await this.repository.findByEmailOrName(body.email, body.name);
 
     if (!user?.length) {
@@ -49,6 +49,8 @@ export class UsersService {
       );
     }
 
-    return this.jwtService.sign({ id: user[0].id });
+    const token = this.jwtService.sign({ id: user[0].id });
+
+    return { token };
   }
 }
