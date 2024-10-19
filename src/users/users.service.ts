@@ -12,7 +12,7 @@ export class UsersService {
   ) {}
 
   async create(body: UserRegisterDTO): Promise<void> {
-    const userData = await this.repository.findByEmailOrName(body.email, body.name);
+    const userData = await this.repository.findByEmail(body.email);
 
     if (userData?.length > 0) {
       const statusCode = HttpStatus.PRECONDITION_FAILED;
@@ -31,7 +31,7 @@ export class UsersService {
   }
 
   async login(body: Partial<UserRegisterDTO>): Promise<{ token: string }>{
-    const user = await this.repository.findByEmailOrName(body.email, body.name);
+    const user = await this.repository.findByEmail(body.email);
 
     if (!user?.length) {
       throw new HttpException(

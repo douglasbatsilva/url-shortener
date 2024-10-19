@@ -10,11 +10,10 @@ export class UsersRepository {
     private readonly repository: Repository<User>,
   ) {}
 
-  findByEmailOrName(email: string, name: string): Promise<User[]> {
+  findByEmail(email: string): Promise<User[]> {
     return this.repository
       .createQueryBuilder('user')
       .where('user.email = :email', { email })
-      .orWhere('user.name = :name', { name })
       .getMany();
   }
 
