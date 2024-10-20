@@ -5,6 +5,8 @@ import {
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -20,6 +22,21 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.useStaticAssets({
+    root: join(__dirname, '..', 'public'),
+    prefix: '/public/',
+  });
+
+  const config = new DocumentBuilder()
+    .setTitle('Users And Url Shortener')
+    .setDescription('Manager for users and url shortener')
+    .addBearerAuth({ type: 'http', in: 'header' })
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
