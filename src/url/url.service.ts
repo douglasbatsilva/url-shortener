@@ -49,10 +49,6 @@ export class UrlService {
   }
 
   async findOriginalUrl(shortUrl: string): Promise<string> {
-    if (shortUrl.length !== 6) {
-      throw new HttpException('Invalid URL', HttpStatus.BAD_REQUEST);
-    }
-
     const foundUrl = await this.find({ shortUrl });
 
     this.eventEmitter.emit('url.metric', foundUrl);
@@ -60,7 +56,7 @@ export class UrlService {
     return foundUrl.originalUrl;
   }
 
-  @OnEvent('url.metric',  { async: true })
+  @OnEvent('url.metric', { async: true })
   async onUrlMetric(url: Url) {
     url.clicks += 1;
     this.repository.update({ id: url.id }, url);
