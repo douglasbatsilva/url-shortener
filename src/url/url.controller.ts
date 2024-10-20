@@ -14,6 +14,7 @@ import { FastifyReply } from 'fastify';
 import { JwtAuthGuard, Public } from 'src/guards/auth.guard';
 import { User } from 'src/decorators/user.decorator';
 import { IRequestUser } from 'src/interfaces/user.interface';
+import { ShortenUrlDto } from './dto/url.dto';
 
 @Controller('')
 export class UrlController {
@@ -23,12 +24,12 @@ export class UrlController {
   @Public()
   @Post('shorten')
   async shorten(
-    @Body('url') url: string,
+    @Body() body: ShortenUrlDto,
     @Res() reply: FastifyReply,
     @User() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
-    const shortUrl = await this.service.createShortUrl(url, userId);
+    const shortUrl = await this.service.createShortUrl(body.url, userId);
     return reply.status(201).send(shortUrl);
   }
 
@@ -44,12 +45,12 @@ export class UrlController {
   @Put('/:shortUrl')
   async updateUrl(
     @Param('shortUrl') shortUrl: string,
-    @Body('url') url: string,
+    @Body() body: ShortenUrlDto,
     @Res() reply: FastifyReply,
     @User() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
-    const resp = await this.service.update(shortUrl, userId, url);
+    const resp = await this.service.update(shortUrl, userId, body.url);
     return reply.status(200).send(resp);
   }
 

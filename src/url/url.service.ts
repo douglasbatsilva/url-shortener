@@ -22,11 +22,7 @@ export class UrlService {
     originalUrl: string,
     userId: number | null,
   ): Promise<string> {
-    const treatedUrl = this.treatUrl(originalUrl);
-
-    const shortUrl = this.nanoid();
-
-    const urlBody: Partial<Url> = { originalUrl: treatedUrl, shortUrl };
+    const urlBody: Partial<Url> = { originalUrl, shortUrl: this.nanoid() };
 
     if (userId != null) urlBody.author = { id: userId } as User;
 
@@ -35,17 +31,6 @@ export class UrlService {
     const baseUrl = this.configService.get<string>('BASE_URL');
 
     return `${baseUrl}/${shorted.shortUrl}`;
-  }
-
-  treatUrl(url: string): string | null {
-    const regex =
-      /^(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/g;
-
-    if (regex.test(url) === false) return null;
-
-    if (!/^https?:\/\//.test(url)) return `https://${url}`;
-
-    return url;
   }
 
   async find(where: Partial<Url>): Promise<any> {
@@ -96,7 +81,7 @@ export class UrlService {
   ): Promise<UpdateResult> {
     const foundUrl = await this.find({ shortUrl, authorId: userId });
 
-    foundUrl.originalUrl = this.treatUrl(url);
+    foundUrl.originalUrl = url;
     foundUrl.updatedAt = new Date();
 
     return this.repository.update({ id: foundUrl.id }, foundUrl);
