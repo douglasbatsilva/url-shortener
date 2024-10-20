@@ -14,7 +14,7 @@ export class UsersService {
   async create(body: UserRegisterDTO): Promise<void> {
     const userData = await this.repository.findByEmail(body.email);
 
-    if (userData?.length > 0) {
+    if (userData == null) {
       const statusCode = HttpStatus.PRECONDITION_FAILED;
       throw new HttpException('User already exists', statusCode);
     }
@@ -33,10 +33,10 @@ export class UsersService {
   async login(body: Partial<UserRegisterDTO>): Promise<{ token: string }> {
     const user = await this.repository.findByEmail(body.email);
 
-    if (!user?.length) {
+    if (user == null) {
       throw new HttpException(
-        'Invalid User or Password',
-        HttpStatus.UNAUTHORIZED,
+        'User not found',
+        HttpStatus.NOT_FOUND,
       );
     }
 

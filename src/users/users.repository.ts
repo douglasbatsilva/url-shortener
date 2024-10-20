@@ -10,11 +10,11 @@ export class UsersRepository {
     private readonly repository: Repository<User>,
   ) {}
 
-  findByEmail(email: string): Promise<User[]> {
+  findByEmail(email: string): Promise<User> {
     return this.repository
       .createQueryBuilder('user')
       .where('user.email = :email', { email })
-      .getMany();
+      .getOne();
   }
 
   async create(user: Partial<User>): Promise<User> {
