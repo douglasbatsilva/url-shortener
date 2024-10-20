@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Url } from './url.entity';
 import { IsNull, UpdateResult } from 'typeorm';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UrlService {
@@ -16,6 +17,7 @@ export class UrlService {
   constructor(
     private readonly configService: ConfigService,
     private readonly repository: UrlRepository,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createShortUrl(
@@ -53,10 +55,15 @@ export class UrlService {
 
     const foundUrl = await this.find({ shortUrl });
 
-    foundUrl.clicks += 1;
-    this.repository.update({ id: foundUrl.id }, foundUrl);
+    this.eventEmitter.emit('url.metric', foundUrl);
 
     return foundUrl.originalUrl;
+  }
+
+  @OnEvent('url.metric',  { async: true })
+  async onUrlMetric(url: Url) {
+    url.clicks += 1;
+    this.repository.update({ id: url.id }, url);
   }
 
   async list(userId: number | null): Promise<Partial<Url>[]> {
@@ -64,6 +71,8 @@ export class UrlService {
       authorId: userId,
       deletedAt: IsNull() as any,
     })) as Url[];
+
+    if (urls == null || urls.length === 0) return [];
 
     return urls.map((url) => {
       return {
