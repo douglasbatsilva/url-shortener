@@ -27,9 +27,6 @@ export class Url {
   @Column({ length: 6, unique: true })
   shortUrl: string;
 
-  @Column({ default: 0 })
-  clicks: number;
-
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
