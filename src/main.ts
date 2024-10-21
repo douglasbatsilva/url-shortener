@@ -39,7 +39,10 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  await app.listen({
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
+    host: '0.0.0.0',
+  });
 }
 
 ClusterService.clusterize(bootstrap);
