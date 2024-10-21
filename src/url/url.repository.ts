@@ -10,7 +10,7 @@ export class UrlRepository {
     private readonly repository: Repository<Url>,
   ) {}
 
-  findOne(where: Partial<Url>): Promise<Url> {
+  findOne(where: Partial<Url>): Promise<Url | null> {
     return this.repository.findOne({ where });
   }
 

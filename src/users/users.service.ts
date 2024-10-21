@@ -14,14 +14,14 @@ export class UsersService {
   async create(body: UserRegisterDTO): Promise<void> {
     const userData = await this.repository.findByEmail(body.email);
 
-    if (userData == null) {
+    if (userData != null) {
       const statusCode = HttpStatus.PRECONDITION_FAILED;
       throw new HttpException('User already exists', statusCode);
     }
 
     const user = this.buildUserData(body);
 
-    this.repository.create(user);
+    await this.repository.create(user);
   }
 
   buildUserData(body: UserRegisterDTO): UserRegisterDTO {
@@ -42,14 +42,14 @@ export class UsersService {
 
     const hash = createHash('sha1').update(body.password).digest('hex');
 
-    if (hash !== user[0].password) {
+    if (hash !== user.password) {
       throw new HttpException(
         'Invalid User or Password',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    const token = this.jwtService.sign({ id: user[0].id });
+    const token = this.jwtService.sign({ id: user.id });
 
     return { token };
   }
