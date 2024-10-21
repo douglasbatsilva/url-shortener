@@ -7,6 +7,7 @@ import { Url } from './url.entity';
 import { IsNull, UpdateResult } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { IRequest } from 'src/interfaces/request.interface';
+import { MetricService } from 'src/metrics/metric.service';
 
 @Injectable()
 export class UrlService {
@@ -17,6 +18,7 @@ export class UrlService {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly metricService: MetricService,
     private readonly repository: UrlRepository,
     private eventEmitter: EventEmitter2,
   ) {}
@@ -65,6 +67,8 @@ export class UrlService {
   }
 
   async list(userId: number | null): Promise<Partial<Url>[]> {
+    if (userId == null) return [];
+
     const urls = (await this.repository.find({
       userId,
       deletedAt: IsNull() as any,
@@ -72,10 +76,16 @@ export class UrlService {
 
     if (urls == null || urls.length === 0) return [];
 
+    const list = urls.map((url) => url.shortUrl);
+
+    const clicksMap = await this.metricService.countUrlClicksByAuthor(list);
+
     return urls.map((url) => {
+      const clicks = clicksMap[url.shortUrl] || "0";
       return {
         originalUrl: url.originalUrl,
         shortUrl: url.shortUrl,
+        clicks: Number(clicks),
       };
     });
   }

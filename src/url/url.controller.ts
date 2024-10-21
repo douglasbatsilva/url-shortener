@@ -48,8 +48,8 @@ export class UrlController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiBearerAuth()
   @HttpCode(200)
-  async list(@Request() user: IRequestUser) {
-    const userId = user?.id ?? null;
+  async list(@Request() request: IRequest,) {
+    const userId = request.user?.id ?? null;
     return this.service.list(userId);
   }
 
