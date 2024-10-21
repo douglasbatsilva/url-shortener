@@ -35,7 +35,7 @@ export class UrlService {
     return `${baseUrl}/${shorted.shortUrl}`;
   }
 
-  async find(where: Partial<Url>): Promise<any> {
+  async find(where: Partial<Url>): Promise<Url | null> {
     const foundUrl = (await this.repository.findOne({
       ...where,
       deletedAt: IsNull() as any,
@@ -54,12 +54,6 @@ export class UrlService {
     this.eventEmitter.emit('url.metric', foundUrl);
 
     return foundUrl.originalUrl;
-  }
-
-  @OnEvent('url.metric', { async: true })
-  async onUrlMetric(url: Url) {
-    url.clicks += 1;
-    this.repository.update({ id: url.id }, url);
   }
 
   async list(userId: number | null): Promise<Partial<Url>[]> {
