@@ -26,7 +26,7 @@ export class UrlService {
   ): Promise<string> {
     const urlBody: Partial<Url> = { originalUrl, shortUrl: this.nanoid() };
 
-    if (userId != null) urlBody.author = { id: userId } as User;
+    if (userId != null) urlBody.user = { id: userId } as User;
 
     const shorted = await this.repository.create(urlBody);
 
@@ -58,7 +58,7 @@ export class UrlService {
 
   async list(userId: number | null): Promise<Partial<Url>[]> {
     const urls = (await this.repository.find({
-      authorId: userId,
+      userId,
       deletedAt: IsNull() as any,
     })) as Url[];
 
@@ -78,7 +78,7 @@ export class UrlService {
     userId: number | null,
     url: string,
   ): Promise<UpdateResult> {
-    const foundUrl = await this.find({ shortUrl, authorId: userId });
+    const foundUrl = await this.find({ shortUrl, userId });
 
     foundUrl.originalUrl = url;
     foundUrl.updatedAt = new Date();
@@ -87,7 +87,7 @@ export class UrlService {
   }
 
   async delete(shortUrl: string, userId: number | null): Promise<UpdateResult> {
-    const foundUrl = await this.find({ shortUrl, authorId: userId });
+    const foundUrl = await this.find({ shortUrl, userId });
 
     foundUrl.deletedAt = new Date();
 

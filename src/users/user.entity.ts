@@ -25,7 +25,7 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
-  @OneToMany(() => Url, (url) => url.author)
+  @OneToMany(() => Url, (url) => url.user)
   urls: Url[];
 
   @CreateDateColumn({ type: 'timestamp' })

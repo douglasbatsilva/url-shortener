@@ -5,12 +5,13 @@ import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Url } from './url.entity';
-import { UrlMetricsListener } from './listeners/url-metrics.listener';
+import { UrlListener } from './url.listener';
+
 
 const createdUrl: Url = {
-  id: 'mock-id',
-  authorId: null,
-  author: null,
+  id: 1,
+  userId: null,
+  user: null,
   originalUrl: 'http://example.com',
   shortUrl: 'abc123',
   clicks: 0,
@@ -24,13 +25,13 @@ describe('UrlService', () => {
   let repository: UrlRepository;
   let configService: ConfigService;
   let eventEmitter: EventEmitter2;
-  let listener: UrlMetricsListener;
+  let listener: UrlListener;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UrlService,
-        UrlMetricsListener,
+        UrlListener,
         {
           provide: UrlRepository,
           useValue: {
@@ -59,7 +60,7 @@ describe('UrlService', () => {
     repository = module.get<UrlRepository>(UrlRepository);
     configService = module.get<ConfigService>(ConfigService);
     eventEmitter = module.get<EventEmitter2>(EventEmitter2);
-    listener = module.get<UrlMetricsListener>(UrlMetricsListener);
+    listener = module.get<UrlListener>(UrlListener);
   });
 
   describe('createShortUrl', () => {
@@ -77,7 +78,7 @@ describe('UrlService', () => {
       expect(repository.create).toHaveBeenCalledWith({
         originalUrl,
         shortUrl: expect.any(String),
-        author: { id: userId },
+        user: { id: userId },
       });
       expect(configService.get).toHaveBeenCalledWith('BASE_URL');
       expect(result).toBe(`${baseUrl}/${shortUrl}`);
@@ -149,7 +150,7 @@ describe('UrlService', () => {
       const result = await service.list(userId);
 
       expect(repository.find).toHaveBeenCalledWith({
-        authorId: userId,
+        userId: userId,
         deletedAt: expect.anything(),
       });
       expect(result).toEqual([
@@ -181,7 +182,7 @@ describe('UrlService', () => {
 
       await service.update(shortUrl, userId, newUrl);
 
-      expect(service.find).toHaveBeenCalledWith({ shortUrl, authorId: userId });
+      expect(service.find).toHaveBeenCalledWith({ shortUrl, userId: userId });
       expect(createdUrl.originalUrl).toBe(newUrl);
       expect(repository.update).toHaveBeenCalledWith({ id: createdUrl.id }, createdUrl);
     });
@@ -197,7 +198,7 @@ describe('UrlService', () => {
 
       await service.delete(shortUrl, userId);
 
-      expect(service.find).toHaveBeenCalledWith({ shortUrl, authorId: userId });
+      expect(service.find).toHaveBeenCalledWith({ shortUrl, userId: userId });
       expect(createdUrl.deletedAt).toBeInstanceOf(Date);
       expect(repository.update).toHaveBeenCalledWith({ id: createdUrl.id }, createdUrl);
     });

@@ -11,20 +11,20 @@ import { User } from '../users/user.entity';
 
 @Entity()
 export class Url {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'authorId' })
-  author: User | null;
+  @JoinColumn({ name: 'userId' })
+  user: User | null;
 
   @Column({ nullable: true })
-  authorId: number | null;
+  userId: number | null;
 
   @Column()
   originalUrl: string;
 
-  @Column({ length: 6 })
+  @Column({ length: 6, unique: true })
   shortUrl: string;
 
   @Column({ default: 0 })
