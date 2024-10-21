@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: teddy-tec-test
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+    environment:
+      JWT_SECRET: ewogICAgICB1c2VyOiAnRG91Z2xhcyBCYXRpc3RhJywKICAgICAgdHlwZTogJ0Rlc2FmaW8gVGVjbmljbycsCiAgICB9
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: teddytest
+      BASE_URL: http://localhost:3000
+      MAX_WORKERS: 4
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: teddytest
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "log_statement=all"]
+
+volumes:
+  postgres-data:
