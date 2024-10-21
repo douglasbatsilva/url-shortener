@@ -1,7 +1,6 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserLoginDTO, UserRegisterDTO } from './dto/user.dto';
-import { FastifyReply } from 'fastify';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Users')
@@ -16,9 +15,9 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 412, description: 'User already exists.' })
   @ApiBody({ type: UserRegisterDTO })
-  async create(@Body() body: UserRegisterDTO, @Res() reply: FastifyReply) {
-    const resp = await this.service.create(body);
-    reply.status(201).send(resp);
+  @HttpCode(201)
+  async create(@Body() body: UserRegisterDTO) {
+    return this.service.create(body);
   }
 
   @Post('login')
@@ -26,11 +25,10 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User token' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiBody({ type: UserLoginDTO })
+  @HttpCode(200)
   async login(
     @Body() body: UserLoginDTO,
-    @Res() reply: FastifyReply,
   ) {
-    const resp = await this.service.login(body);
-    reply.status(200).send(resp);
+    return this.service.login(body);
   }
 }

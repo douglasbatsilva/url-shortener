@@ -8,6 +8,7 @@ import {
   UseGuards,
   Put,
   Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { UrlService } from './url.service';
 import { FastifyReply } from 'fastify';
@@ -31,14 +32,13 @@ export class UrlController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiBody({ type: ShortenUrlDto })
   @ApiBearerAuth()
+  @HttpCode(201)
   async shorten(
     @Body() body: ShortenUrlDto,
-    @Res() reply: FastifyReply,
     @User() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
-    const shortUrl = await this.service.createShortUrl(body.url, userId);
-    return reply.status(201).send(shortUrl);
+    return this.service.createShortUrl(body.url, userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,10 +47,10 @@ export class UrlController {
   @ApiResponse({ status: 200, description: 'Urls list.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiBearerAuth()
-  async list(@Res() reply: FastifyReply, @User() user: IRequestUser) {
+  @HttpCode(200)
+  async list(@User() user: IRequestUser) {
     const userId = user?.id ?? null;
-    const urls = await this.service.list(userId);
-    return reply.status(200).send(urls);
+    return this.service.list(userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -63,15 +63,14 @@ export class UrlController {
   @ApiParam({ name: 'shortUrl' })
   @ApiBody({ type: ShortenUrlDto })
   @ApiBearerAuth()
+  @HttpCode(204)
   async updateUrl(
     @Param() params: ShortUrlDto,
     @Body() body: ShortenUrlDto,
-    @Res() reply: FastifyReply,
     @User() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
-    await this.service.update(params.shortUrl, userId, body.url);
-    return reply.status(204);
+    return this.service.update(params.shortUrl, userId, body.url);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -83,14 +82,13 @@ export class UrlController {
   @ApiResponse({ status: 404, description: 'URL not found.' })
   @ApiParam({ name: 'shortUrl' })
   @ApiBearerAuth()
+  @HttpCode(204)
   async deleteUrl(
     @Param() params: ShortUrlDto,
-    @Res() reply: FastifyReply,
     @User() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
-    await this.service.delete(params.shortUrl, userId);
-    return reply.status(204);
+    return this.service.delete(params.shortUrl, userId);
   }
 
   @UseGuards(JwtAuthGuard)
