@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Url } from '../url.entity';
-import { UrlRepository } from '../url.repository';
+import { Url } from './url.entity';
+import { UrlRepository } from './url.repository';
 
 @Injectable()
-export class UrlMetricsListener {
+export class UrlListener {
   constructor(private readonly repository: UrlRepository) {}
 
   @OnEvent('url.metric', { async: true })
