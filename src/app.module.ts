@@ -4,6 +4,7 @@ import { DatabaseModule } from './infra/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { UrlModule } from './url/url.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MetricModule } from './metrics/metric.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     EventEmitterModule.forRoot(),
     DatabaseModule,
     UsersModule,
+    MetricModule,
     UrlModule,
   ],
 })
