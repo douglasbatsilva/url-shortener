@@ -9,7 +9,7 @@ import { ExtractJwt } from 'passport-jwt';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { IRequestUser } from 'src/interfaces/user.interface';
+import { IRequestUser } from 'src/interfaces/request.interface';
 
 const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
