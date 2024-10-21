@@ -5,7 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Url } from './url.entity';
 import { IsNull, UpdateResult } from 'typeorm';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { IRequest } from 'src/interfaces/request.interface';
 
 @Injectable()
 export class UrlService {
@@ -48,10 +49,17 @@ export class UrlService {
     return foundUrl;
   }
 
-  async findOriginalUrl(shortUrl: string): Promise<string> {
+  async findOriginalUrl(shortUrl: string, request: IRequest): Promise<string> {
     const foundUrl = await this.find({ shortUrl });
 
-    this.eventEmitter.emit('url.metric', foundUrl);
+    this.eventEmitter.emit('insert-metric', { 
+      userId: foundUrl.userId,
+      ip: request.ip,
+      userAgent: request.userAgent,
+      hostname: request.hostname,
+      urlId: foundUrl.id,
+      shortUrl,
+    });
 
     return foundUrl.originalUrl;
   }
@@ -68,7 +76,6 @@ export class UrlService {
       return {
         originalUrl: url.originalUrl,
         shortUrl: url.shortUrl,
-        clicks: url.clicks,
       };
     });
   }

@@ -4,11 +4,11 @@ import { UrlService } from './url.service';
 import { UrlController } from './url.controller';
 import { Url } from './url.entity';
 import { UrlRepository } from './url.repository';
-import { UrlListener } from './url.listener';
+import { Metric } from 'src/metrics/metric.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Url])],
-  providers: [UrlService, UrlRepository, UrlListener],
+  imports: [TypeOrmModule.forFeature([Url]), TypeOrmModule.forFeature([Metric])],
+  providers: [UrlService, UrlRepository],
   controllers: [UrlController],
 })
 export class UrlModule {}
