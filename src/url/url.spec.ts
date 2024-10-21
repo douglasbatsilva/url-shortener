@@ -10,6 +10,7 @@ import { MetricListener } from '../metrics/metric.listener';
 import { Repository } from 'typeorm';
 import { Metric } from '../metrics/metric.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { MetricService } from '../metrics/metric.service';
 
 const createdUrl: Url = {
   id: 1,
@@ -29,6 +30,7 @@ describe('UrlService', () => {
   let eventEmitter: EventEmitter2;
   let listener: MetricListener;
   let metricRepository: Repository<Metric>;
+  let metricService: MetricService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,7 +61,13 @@ describe('UrlService', () => {
         {
           provide: getRepositoryToken(Metric),
           useValue: {
-            insert: jest.fn(), // Mock the insert method
+            insert: jest.fn(),
+          },
+        },
+        {
+          provide: MetricService,
+          useValue: {
+            countUrlClicksByAuthor: jest.fn(),
           },
         },
       ],
@@ -71,6 +79,7 @@ describe('UrlService', () => {
     eventEmitter = module.get<EventEmitter2>(EventEmitter2);
     listener = module.get<MetricListener>(MetricListener);
     metricRepository = module.get<Repository<Metric>>(getRepositoryToken(Metric));
+    metricService = module.get<MetricService>(MetricService);
   });
 
   describe('createShortUrl', () => {
@@ -171,6 +180,7 @@ describe('UrlService', () => {
         {
           originalUrl: 'http://example.com',
           shortUrl: 'abc123',
+          clicks: 0,
         },
       ]);
     });

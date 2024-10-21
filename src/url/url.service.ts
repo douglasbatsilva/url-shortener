@@ -2,12 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { customAlphabet } from 'nanoid';
 import { UrlRepository } from './url.repository';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/users/user.entity';
+import { User } from '../users/user.entity';
 import { Url } from './url.entity';
 import { IsNull, UpdateResult } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { IRequest } from 'src/interfaces/request.interface';
-import { MetricService } from 'src/metrics/metric.service';
+import { IRequest } from '../interfaces/request.interface';
+import { MetricService } from '../metrics/metric.service';
 
 @Injectable()
 export class UrlService {
@@ -81,7 +81,7 @@ export class UrlService {
     const clicksMap = await this.metricService.countUrlClicksByAuthor(list);
 
     return urls.map((url) => {
-      const clicks = clicksMap[url.shortUrl] || "0";
+      const clicks = clicksMap?.[url?.shortUrl] || "0";
       return {
         originalUrl: url.originalUrl,
         shortUrl: url.shortUrl,
