@@ -13,10 +13,10 @@ import {
 import { UrlService } from './url.service';
 import { FastifyReply } from 'fastify';
 import { JwtAuthGuard, Public } from 'src/guards/auth.guard';
-import { User } from 'src/decorators/user.decorator';
-import { IRequestUser } from 'src/interfaces/user.interface';
 import { ShortenUrlDto, ShortUrlDto } from './dto/url.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'src/decorators/request.decorator';
+import { IRequest, IRequestUser } from 'src/interfaces/request.interface';
 
 @ApiTags('Url')
 @Controller('')
@@ -35,7 +35,7 @@ export class UrlController {
   @HttpCode(201)
   async shorten(
     @Body() body: ShortenUrlDto,
-    @User() user: IRequestUser,
+    @Request() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
     return this.service.createShortUrl(body.url, userId);
@@ -48,7 +48,7 @@ export class UrlController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiBearerAuth()
   @HttpCode(200)
-  async list(@User() user: IRequestUser) {
+  async list(@Request() user: IRequestUser) {
     const userId = user?.id ?? null;
     return this.service.list(userId);
   }
@@ -67,7 +67,7 @@ export class UrlController {
   async updateUrl(
     @Param() params: ShortUrlDto,
     @Body() body: ShortenUrlDto,
-    @User() user: IRequestUser,
+    @Request() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
     return this.service.update(params.shortUrl, userId, body.url);
@@ -85,7 +85,7 @@ export class UrlController {
   @HttpCode(204)
   async deleteUrl(
     @Param() params: ShortUrlDto,
-    @User() user: IRequestUser,
+    @Request() user: IRequestUser,
   ) {
     const userId = user?.id ?? null;
     return this.service.delete(params.shortUrl, userId);
@@ -103,8 +103,9 @@ export class UrlController {
   async redirect(
     @Param() params: ShortUrlDto,
     @Res() reply: FastifyReply,
+    @Request() request: IRequest,
   ) {
-    const foundUrl = await this.service.findOriginalUrl(params.shortUrl);
+    const foundUrl = await this.service.findOriginalUrl(params.shortUrl, request);
     return reply.redirect(foundUrl, 302);
   }
 }
