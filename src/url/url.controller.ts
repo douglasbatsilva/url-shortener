@@ -35,9 +35,9 @@ export class UrlController {
   @HttpCode(201)
   async shorten(
     @Body() body: ShortenUrlDto,
-    @Request() user: IRequestUser,
+    @Request() request: IRequest,
   ) {
-    const userId = user?.id ?? null;
+    const userId = request?.user?.id ?? null;
     return this.service.createShortUrl(body.url, userId);
   }
 
@@ -67,9 +67,9 @@ export class UrlController {
   async updateUrl(
     @Param() params: ShortUrlDto,
     @Body() body: ShortenUrlDto,
-    @Request() user: IRequestUser,
+    @Request() request: IRequest,
   ) {
-    const userId = user?.id ?? null;
+    const userId = request.user?.id ?? null;
     return this.service.update(params.shortUrl, userId, body.url);
   }
 
@@ -85,9 +85,9 @@ export class UrlController {
   @HttpCode(204)
   async deleteUrl(
     @Param() params: ShortUrlDto,
-    @Request() user: IRequestUser,
+    @Request() request: IRequest,
   ) {
-    const userId = user?.id ?? null;
+    const userId = request.user?.id ?? null;
     return this.service.delete(params.shortUrl, userId);
   }
 
