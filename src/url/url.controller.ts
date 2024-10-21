@@ -15,7 +15,7 @@ import { JwtAuthGuard, Public } from 'src/guards/auth.guard';
 import { User } from 'src/decorators/user.decorator';
 import { IRequestUser } from 'src/interfaces/user.interface';
 import { ShortenUrlDto, ShortUrlDto } from './dto/url.dto';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Url')
 @Controller('')
@@ -30,6 +30,7 @@ export class UrlController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiBody({ type: ShortenUrlDto })
+  @ApiBearerAuth()
   async shorten(
     @Body() body: ShortenUrlDto,
     @Res() reply: FastifyReply,
@@ -45,6 +46,7 @@ export class UrlController {
   @ApiOperation({ summary: 'List Urls' })
   @ApiResponse({ status: 200, description: 'Urls list.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
   async list(@Res() reply: FastifyReply, @User() user: IRequestUser) {
     const userId = user?.id ?? null;
     const urls = await this.service.list(userId);
@@ -60,6 +62,7 @@ export class UrlController {
   @ApiResponse({ status: 404, description: 'URL not found.' })
   @ApiParam({ name: 'shortUrl' })
   @ApiBody({ type: ShortenUrlDto })
+  @ApiBearerAuth()
   async updateUrl(
     @Param() params: ShortUrlDto,
     @Body() body: ShortenUrlDto,
@@ -79,6 +82,7 @@ export class UrlController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 404, description: 'URL not found.' })
   @ApiParam({ name: 'shortUrl' })
+  @ApiBearerAuth()
   async deleteUrl(
     @Param() params: ShortUrlDto,
     @Res() reply: FastifyReply,
@@ -97,6 +101,7 @@ export class UrlController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 404, description: 'URL not found.' })
   @ApiParam({ name: 'shortUrl' })
+  @ApiBearerAuth()
   async redirect(
     @Param() params: ShortUrlDto,
     @Res() reply: FastifyReply,
